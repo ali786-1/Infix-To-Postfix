@@ -1,0 +1,148 @@
+// conversion of infix to postfix
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+#define SIZE 100
+char stack[SIZE];
+int top=-1;
+void push(char item)
+{
+    if(top>=SIZE-1)
+    {
+        printf("stack overflow\n");
+    }
+    else
+    {
+        top=top+1;
+        stack[top]=item;
+    }
+}
+char pop()
+{
+    if(top==-1)
+    {
+        printf("stack underflow");
+    }
+    else
+    {
+        char item;
+        item=stack[top];
+        top=top-1;
+        return item;
+    }
+}
+int is_operator(char ch)
+{
+    if(ch=='+' || ch=='-' || ch=='/' || ch=='^' || ch=='%'|| ch=='*')
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
+}
+int precedense(char c)
+{
+    if(c=='^' || c=='%')
+    {
+        return 3;
+    }
+    else if(c=='*' || c=='/')
+    {
+        return 2;
+    }
+    else if(c=='+' || c=='-')
+    {
+            return 1;
+    }
+    else
+    {
+        return 0;
+    }
+}
+int is_digit(char c)
+{
+    if(c>='0' && c<='9') 
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
+}
+int is_alpha(char c)
+{
+    if((c>='a' && c<='z') || (c>='A' && c<='Z'))
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
+}
+void inf_pos(char ifx[],char pos[])
+{
+    int i,j;
+    char item;
+    char x;
+    i=0;
+    j=0;
+    push('(');
+    strcat(ifx,")");
+    item=ifx[i];
+    while(item!='\0')
+    {
+        if(item=='(')
+        {
+            push(item);
+        }
+        else if(is_digit(item)==1 || is_alpha(item)==1)
+        {
+            pos[j]=item;
+            j=j+1;
+        }
+        else if(is_operator(item)==1)
+        {
+            x=pop();
+            while(is_operator(x)==1 && precedense(x)>=precedense(item))
+            {
+                pos[j]=x;
+                j=j+1;
+                x=pop();
+            }
+            push(x);
+            push(item);
+        }
+        else if(item==')')
+        {
+            x=pop();
+            while(x!='(')
+            {
+                pos[j]=x;
+                j=j+1;
+                x=pop();
+            }
+        }
+        else
+        {
+            printf("Invalid expression");
+            exit(1);
+        }
+        i=i+1;
+        item=ifx[i];
+    }
+    pos[j]='\0';
+}
+void main()
+{
+    char infix[SIZE];
+    char postfix[SIZE];
+    printf("enter The infix expression");
+    gets(infix);
+    inf_pos(infix,postfix);
+    printf("postfix expression is");
+    puts(postfix);
+}
